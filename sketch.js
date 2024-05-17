@@ -32,13 +32,13 @@ function draw(){
   background("white")
 
   ground.velocityX = -2;
-  //console.log(ground.x);
+  console.log(trex.y);
 
   if(ground.x<0){
     ground.x = ground.width/2;
   }
 
-  if(keyDown("space")) {
+  if(keyDown("space") && trex.y >=100 ) {
     trex.velocityY = -10;
   }
   trex.velocityY = trex.velocityY + 0.5;
