@@ -7,6 +7,8 @@ var score = 0;
 var PLAY = 1;
 var END = 0;
 var gameState = PLAY;
+var obstacleGroup, cloudsGroup;
+var gameOverImg, restarImg, gameOver, restart;
 function preload(){
   trex_running = loadAnimation("trex1.png", "trex3.png", "trex4.png" );
   groundImage = loadImage("ground2.png");
@@ -17,6 +19,9 @@ function preload(){
   obstacle4 = loadImage("obstacle4.png");
   obstacle5 = loadImage("obstacle5.png");
   obstacle6 = loadImage("obstacle6.png");
+
+  restarImg = loadImage("restart.png");
+  gameOverImg = loadImage("gameOver.png");
 
 }
 
@@ -41,6 +46,19 @@ function setup(){
   console.log(rand)
 
   console.log("Hola "+"mundo");
+
+  gameOver = createSprite(300,100);
+  gameOver.addImage(gameOverImg);
+
+  restart = createSprite(300, 140);
+  restart.addImage(restarImg);
+
+  gameOver.scale = 0.5;
+  restart.scale = 0.5;
+
+  //crear grupos de obstáculos y nubes
+  obstacleGroup = new Group();
+  cloudsGroup = new Group();
 }
 
 function draw(){
@@ -70,11 +88,22 @@ function draw(){
     spawnClouds();
     spawnObstacles();
 
+    //detectar si el trex toca un obstáculo
+    if(obstacleGroup.isTouching(trex)){
+      gameState = END
+    }
+
   }
   else if(gameState === END){
     //el suelo se detiene
     ground.velocityX = 0;
 
+    //detener obstáculos y nubes
+    obstacleGroup.setVelocityXEach(0);
+    cloudsGroup.setVelocityXEach(0);
+
+    gameOver.visible = true;
+    restart.visible = true;
   }
 
   
@@ -105,6 +134,9 @@ function spawnClouds(){
     //ajustar la profundidad de los sprites
     cloud.depth = trex.depth;
     trex.depth = trex.depth + 1;
+
+  //agregar cada nube al grupo
+  cloudsGroup.add(cloud);
   }
 }
 
@@ -132,5 +164,8 @@ function spawnObstacles(){
   //asignar escala y lifetime
   obstacle.scale = 0.5;
   obstacle.lifetime = 230;
+
+  //agregar cada obstáculo al grupo
+  obstacleGroup.add(obstacle);
 }
 }
