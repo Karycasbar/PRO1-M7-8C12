@@ -1,4 +1,4 @@
-var trex ,trex_running;
+var trex ,trex_running, trex_collided;
 var ground, obstacle;
 var groundImage, invisibleGround;
 var cloudImage;
@@ -9,6 +9,7 @@ var END = 0;
 var gameState = PLAY;
 var obstacleGroup, cloudsGroup;
 var gameOverImg, restarImg, gameOver, restart;
+var jumpSound, checkPoint, dieSound;
 function preload(){
   trex_running = loadAnimation("trex1.png", "trex3.png", "trex4.png" );
   groundImage = loadImage("ground2.png");
@@ -23,6 +24,11 @@ function preload(){
   restarImg = loadImage("restart.png");
   gameOverImg = loadImage("gameOver.png");
 
+  trex_collided = loadImage("trex_collided.png");
+  jumpSound = loadSound("jump.mp3");
+  checkPoint = loadSound("checkpoint.mp3");
+  dieSound = loadSound("die.mp3");
+
 }
 
 function setup(){
@@ -32,6 +38,7 @@ function setup(){
   //crear sprite de Trex
   trex = createSprite(50,180,20,50);
   trex.addAnimation("running", trex_running);
+  trex.addAnimation("collided", trex_collided);
 
   //agregar tamaño y posicion al trex
   trex.scale = 0.5;
@@ -46,6 +53,8 @@ function setup(){
   console.log(rand)
 
   console.log("Hola "+"mundo");
+  trex.setCollider("circle", 0, 0,40);
+  trex.debug = false;
 
   gameOver = createSprite(300,100);
   gameOver.addImage(gameOverImg);
@@ -65,12 +74,17 @@ function draw(){
   background("white")
   text("Puntuación " + score, 500, 50);
 
+  console.log("el estado es: ", gameState);
+
   if(gameState === PLAY){
     //mover el suelo
-    ground.velocityX = -6;
+    ground.velocityX = -(6 + score/100);
 
     //sumatoria de puntos
     score = score + Math.round(frameCount/60);
+    if(score > 0 && score % 100 === 0){
+      checkPoint.play();
+    }
 
     //reiniciar el suelo del trex
     if(ground.x<0){
@@ -80,6 +94,7 @@ function draw(){
     //tecla de salto
     if(keyDown("space") && trex.y >=100 ) {
       trex.velocityY = -10;
+      jumpSound.play();
     }
     //agregar gravedad
     trex.velocityY = trex.velocityY + 0.5;
@@ -91,16 +106,25 @@ function draw(){
     //detectar si el trex toca un obstáculo
     if(obstacleGroup.isTouching(trex)){
       gameState = END
+      dieSound.play();
     }
 
   }
   else if(gameState === END){
     //el suelo se detiene
     ground.velocityX = 0;
+    trex.velocityX = 0;
 
     //detener obstáculos y nubes
     obstacleGroup.setVelocityXEach(0);
     cloudsGroup.setVelocityXEach(0);
+
+    //cambiar la animacion del trex
+    trex.changeAnimation("collided", trex_collided);
+    
+    //establecer lifetime de los objetos del juego (nubes y obstaculos) para que no desaparezcan
+    obstacleGroup.setLifetimeEach(-1);
+    cloudsGroup.setLifetimeEach(-1);
 
     gameOver.visible = true;
     restart.visible = true;
@@ -108,11 +132,6 @@ function draw(){
 
   
   //console.log(frameCount);
-
-
-
-
-
   //trex choca con el suelo
   trex.collide(invisibleGround);
 
@@ -126,7 +145,7 @@ function spawnClouds(){
     cloud.addImage(cloudImage)
     cloud.y = Math.round(random(10,60));
     cloud.scale = 0.4;
-    cloud.velocityX = -3;
+    cloud.velocityX = -(6 + score/100);;
 
     //tiempo de vida de un sprite
     cloud.lifetime = 230;
@@ -143,7 +162,7 @@ function spawnClouds(){
 function spawnObstacles(){
   if(frameCount % 60 === 0) { 
     obstacle = createSprite(600, 165, 10, 40);
-    obstacle.velocityX = -6;
+    obstacle.velocityX = -(6 + score/100);
   
  var rand = Math.round(random(1,6));
   switch( rand ){
