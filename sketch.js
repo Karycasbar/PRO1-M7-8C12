@@ -10,6 +10,7 @@ var gameState = PLAY;
 var obstacleGroup, cloudsGroup;
 var gameOverImg, restarImg, gameOver, restart;
 var jumpSound, checkPoint, dieSound;
+//var message = "Esto es un mensaje";
 function preload(){
   trex_running = loadAnimation("trex1.png", "trex3.png", "trex4.png" );
   groundImage = loadImage("ground2.png");
@@ -34,6 +35,8 @@ function preload(){
 function setup(){
   createCanvas(600,200)
  
+  
+  
 
   //crear sprite de Trex
   trex = createSprite(50,180,20,50);
@@ -72,6 +75,7 @@ function setup(){
 
 function draw(){
   background("white")
+  //console.log(message)
   text("Puntuación " + score, 500, 50);
 
   console.log("el estado es: ", gameState);
@@ -121,6 +125,10 @@ function draw(){
 
     //cambiar la animacion del trex
     trex.changeAnimation("collided", trex_collided);
+
+    if(mousePressedOver(restart)){
+      console.log("Reinicia el juego");
+    }
     
     //establecer lifetime de los objetos del juego (nubes y obstaculos) para que no desaparezcan
     obstacleGroup.setLifetimeEach(-1);
