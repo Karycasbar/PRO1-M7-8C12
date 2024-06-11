@@ -127,7 +127,7 @@ function draw(){
     trex.changeAnimation("collided", trex_collided);
 
     if(mousePressedOver(restart)){
-      console.log("Reinicia el juego");
+      reset();
     }
     
     //establecer lifetime de los objetos del juego (nubes y obstaculos) para que no desaparezcan
@@ -195,4 +195,9 @@ function spawnObstacles(){
   //agregar cada obstáculo al grupo
   obstacleGroup.add(obstacle);
 }
+}
+function reset(){
+  gameState = PLAY;
+  gameOver.visible = false;
+  restart.visible = false;
 }
