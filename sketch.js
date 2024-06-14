@@ -33,10 +33,7 @@ function preload(){
 }
 
 function setup(){
-  createCanvas(600,200)
- 
-  
-  
+  createCanvas(600,200)  
 
   //crear sprite de Trex
   trex = createSprite(50,180,20,50);
@@ -68,6 +65,8 @@ function setup(){
   gameOver.scale = 0.5;
   restart.scale = 0.5;
 
+
+
   //crear grupos de obstáculos y nubes
   obstacleGroup = new Group();
   cloudsGroup = new Group();
@@ -80,12 +79,15 @@ function draw(){
 
   console.log("el estado es: ", gameState);
 
+  gameOver.visible = false;
+  restart.visible = false;
+
   if(gameState === PLAY){
     //mover el suelo
     ground.velocityX = -(6 + score/100);
 
     //sumatoria de puntos
-    score = score + Math.round(frameCount/60);
+    score = score + Math.round(getFrameRate()/60);
     if(score > 0 && score % 100 === 0){
       checkPoint.play();
     }
@@ -128,6 +130,10 @@ function draw(){
 
     if(mousePressedOver(restart)){
       reset();
+    }
+
+    if(keyDown("space")) {
+      trex.velocityY = 0;      
     }
     
     //establecer lifetime de los objetos del juego (nubes y obstaculos) para que no desaparezcan
@@ -200,4 +206,10 @@ function reset(){
   gameState = PLAY;
   gameOver.visible = false;
   restart.visible = false;
+
+  obstacleGroup.destroyEach();
+  cloudsGroup.destroyEach();
+
+  trex.changeAnimation("running", trex_running);
+  score = 0;
 }
